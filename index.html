@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continuous Speech-to-Text Converter</title>
+    <style>
+
+        *{
+            background-color: rgb(8, 6, 6);
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            padding: 50px;
+            color: white;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            min-height: 50vh;
+            color:white
+        }
+        #startButton, #stopButton{
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Continuous Speech-to-Text Converter</h1>
+    <button id="startButton">Start Recording</button>
+    <button id="stopButton" disabled>Stop Recording</button>
+    <div id="output"></div>
+
+    <script>
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const outputDiv = document.getElementById('output');
+
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+        recognition.continuous = true;
+
+        startButton.addEventListener('click', () => {
+            recognition.start();
+            startButton.disabled = true;
+            stopButton.disabled = false;
+        });
+
+        stopButton.addEventListener('click', () => {
+            recognition.stop();
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            startButton.textContent = 'Start Recording';
+        });
+
+        recognition.addEventListener('result', (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0].transcript)
+                .join('');
+
+            outputDiv.innerHTML = transcript;
+
+            if (event.results[0].isFinal) {
+                outputDiv.innerHTML += '<br>';
+            }
+        });
+
+        recognition.addEventListener('end', () => {
+            startButton.disabled = false;
+            stopButton.disabled = true;
+        });
+    </script>
+</body>
+</html>
